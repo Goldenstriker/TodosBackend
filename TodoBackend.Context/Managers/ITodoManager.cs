@@ -2,8 +2,10 @@
 
 namespace TodoBackend.Context.Managers
 {
-    internal interface ITodoManager
+    public interface ITodoManager
     {
+        Task<List<Records.Outgoing.TodoRecord>> GetAllTodosAsync(int pageSize);
+
         Task CreateTodoAsync(TodoRecord todoRecord);
 
         Task UpdateTodoAsync(Guid todoId, TodoRecord todoRecord);

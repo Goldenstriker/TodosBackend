@@ -4,7 +4,7 @@ using TodoBackend.Context.Models;
 
 namespace TodoBackend.Context.Managers
 {
-    internal class TodoManager : ITodoManager
+    public class TodoManager : ITodoManager
     {
         private readonly DbContextOptions<TodoContext> contextOptions;
 
@@ -27,6 +27,12 @@ namespace TodoBackend.Context.Managers
             using (TodoContext context = new TodoContext(contextOptions))
             {
                 Todo todo = await context.Todos.SingleOrDefaultAsync(x => x.Id == todoId);
+
+                if (todo == null)
+                {
+                    return;
+                }
+
                 context.CreateOrUpdateTodo(todoRecord, todo);
                 await context.SaveChangesAsync();
             }
@@ -52,5 +58,27 @@ namespace TodoBackend.Context.Managers
             }
         }
 
+        public async Task<List<Records.Outgoing.TodoRecord>> GetAllTodosAsync(int pageSize)
+        {
+            using TodoContext context = new TodoContext(contextOptions);
+
+            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+            IQueryable<Records.Outgoing.TodoRecord> todosQuery = from todo in context.Todos
+                                                                 select new Records.Outgoing.TodoRecord()
+                                                                 {
+                                                                     Id = todo.Id,
+                                                                     Title = todo.Title,
+                                                                     Desciption = todo.Description,
+                                                                     TodoItems = todo.TodoItems != null ? todo.TodoItems.Select(todoItem => new Records.Outgoing.TodoItemRecord()
+                                                                     {
+                                                                         Id = todoItem.Id,
+                                                                         Title = todoItem.Title,
+                                                                         Desciption = todoItem.Description,
+                                                                         DueDate = todoItem.DueDate,
+                                                                     }).ToList() : new List<Records.Outgoing.TodoItemRecord>()
+                                                                 };
+            return await todosQuery.ToListAsync();
+        }
     }
 }
