@@ -25,7 +25,7 @@ namespace TodoBackend.Context.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TodoItem",
+                name: "TodoItems",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -38,9 +38,9 @@ namespace TodoBackend.Context.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TodoItem", x => x.Id);
+                    table.PrimaryKey("PK_TodoItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TodoItem_Todos_TodoId",
+                        name: "FK_TodoItems_Todos_TodoId",
                         column: x => x.TodoId,
                         principalTable: "Todos",
                         principalColumn: "Id",
@@ -48,15 +48,15 @@ namespace TodoBackend.Context.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_TodoItem_TodoId",
-                table: "TodoItem",
+                name: "IX_TodoItems_TodoId",
+                table: "TodoItems",
                 column: "TodoId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "TodoItem");
+                name: "TodoItems");
 
             migrationBuilder.DropTable(
                 name: "Todos");

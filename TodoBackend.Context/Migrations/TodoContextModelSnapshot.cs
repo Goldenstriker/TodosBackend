@@ -76,7 +76,7 @@ namespace TodoBackend.Context.Migrations
 
                     b.HasIndex("TodoId");
 
-                    b.ToTable("TodoItem");
+                    b.ToTable("TodoItems");
                 });
 
             modelBuilder.Entity("TodoBackend.Context.Models.TodoItem", b =>

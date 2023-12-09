@@ -11,7 +11,7 @@ using TodoBackend.Context;
 namespace TodoBackend.Context.Migrations
 {
     [DbContext(typeof(TodoContext))]
-    [Migration("20231209033033_InitialMigration")]
+    [Migration("20231209035324_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,7 +78,7 @@ namespace TodoBackend.Context.Migrations
 
                     b.HasIndex("TodoId");
 
-                    b.ToTable("TodoItem");
+                    b.ToTable("TodoItems");
                 });
 
             modelBuilder.Entity("TodoBackend.Context.Models.TodoItem", b =>
