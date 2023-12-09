@@ -10,5 +10,7 @@ namespace TodoBackend.Context
         }
 
         internal DbSet<Todo> Todos { get; set; }
+
+        internal DbSet<TodoItem> TodoItems { get; set; }
     }
 }
