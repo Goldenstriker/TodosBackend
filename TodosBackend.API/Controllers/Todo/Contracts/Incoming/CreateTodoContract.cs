@@ -6,7 +6,7 @@ namespace TodosBackend.API.Controllers.Todo.Contracts.Incoming
     {
         public string Title { get; set; }
 
-        public string Desciption { get; set; }
+        public string Description { get; set; }
 
         public List<UpdateTodoItemContract> TodoItems { get; set; }
     }

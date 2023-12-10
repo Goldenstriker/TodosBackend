@@ -18,7 +18,7 @@ namespace TodoBackend.Context.Managers
             }
 
             todo.Title = todoRecord.Title;
-            todo.Description = todoRecord.Desciption;
+            todo.Description = todoRecord.Description;
             return todo;
         }
 
@@ -36,7 +36,7 @@ namespace TodoBackend.Context.Managers
             }
 
             todoItem.Title = todoItemRecord.Title;
-            todoItem.Description = todoItemRecord.Desciption;
+            todoItem.Description = todoItemRecord.Description;
             todoItem.DueDate = todoItemRecord.DueDate;
             return todoItem;
         }

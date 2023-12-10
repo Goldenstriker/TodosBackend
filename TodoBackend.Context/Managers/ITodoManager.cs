@@ -15,5 +15,7 @@ namespace TodoBackend.Context.Managers
         Task DeleteTodoAsync(Guid todoId);
 
         Task DeleteTodoItemAsync(Guid todoId);
+
+        Task<int> CountAllTodoAsync();
     }
 }

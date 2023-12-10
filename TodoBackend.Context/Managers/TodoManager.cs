@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using TodoBackend.Context.Managers.Records.Incoming;
 using TodoBackend.Context.Models;
 
@@ -90,6 +91,13 @@ namespace TodoBackend.Context.Managers
             }
         }
 
+        public Task<int> CountAllTodoAsync()
+        {
+            using TodoContext context = new TodoContext(contextOptions);
+            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            return context.Todos.CountAsync();
+        }
+
         public async Task<List<Records.Outgoing.TodoRecord>> GetAllTodosAsync(int? pageNumber, int? pageSize)
         {
             using TodoContext context = new TodoContext(contextOptions);
@@ -102,25 +110,52 @@ namespace TodoBackend.Context.Managers
                                                                  {
                                                                      Id = todo.Id,
                                                                      Title = todo.Title,
-                                                                     Desciption = todo.Description,
-                                                                     TodoItems = todo.TodoItems != null ? todo.TodoItems.Select(todoItem => new Records.Outgoing.TodoItemRecord()
-                                                                     {
-                                                                         Id = todoItem.Id,
-                                                                         Title = todoItem.Title,
-                                                                         Desciption = todoItem.Description,
-                                                                         DueDate = todoItem.DueDate,
-                                                                     }).ToList() : new List<Records.Outgoing.TodoItemRecord>()
+                                                                     Description = todo.Description
                                                                  };
 
 
-            if (pageNumber.HasValue && pageSize.HasValue)
+            if (pageSize.HasValue)
             {
+                int fetchPageNumber = pageNumber ?? 1;
+
                 todosQuery = todosQuery
-                               .Skip(pageSize.Value * pageNumber.Value)
+                               .Skip(pageSize.Value * (fetchPageNumber - 1))
                                .Take(pageSize.Value);
             }
 
-            return await todosQuery.ToListAsync();
+            List<Records.Outgoing.TodoRecord> todoRecords = await todosQuery.ToListAsync();
+
+            List<Guid> todoIds = todoRecords.Select(record => record.Id).ToList();
+
+            Dictionary<Guid, List<Records.Internal.TodoItemRecord>> todoItemRecordsTodoIdLkp = (await (from todoItem in context.TodoItems
+                                                                                                       where todoIds.Contains(todoItem.Id)
+                                                                                                       select new Records.Internal.TodoItemRecord()
+                                                                                                       {
+                                                                                                           Id = todoItem.Id,
+                                                                                                           TodoId = todoItem.TodoId,
+                                                                                                           Title = todoItem.Title,
+                                                                                                           Description = todoItem.Description,
+                                                                                                           DueDate = todoItem.DueDate,
+                                                                                                       }).ToListAsync())
+                                                                                                .GroupBy(x => x.TodoId)
+                                                                                                .ToDictionary(x => x.Key, y => y.ToList());
+
+            foreach (Records.Outgoing.TodoRecord item in todoRecords)
+            {
+                List<Records.Internal.TodoItemRecord> todoItemRecords = todoItemRecordsTodoIdLkp.GetValueOrDefault(item.Id, new List<Records.Internal.TodoItemRecord>());
+                if (todoItemRecords.Any())
+                {
+                    item.TodoItems = todoItemRecords.Select(todoItem => new Records.Outgoing.TodoItemRecord()
+                    {
+                        Id = todoItem.Id,
+                        Title = todoItem.Title,
+                        Description = todoItem.Description,
+                        DueDate = todoItem.DueDate,
+                    }).ToList();
+                }
+            }
+
+            return todoRecords;
         }
     }
 }

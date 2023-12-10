@@ -17,25 +17,36 @@ namespace TodosBackend.API.Controllers.Todo
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Contracts.Outgoing.TodoContract>>> GetAllTodos([FromQuery] int? pageNumber = null, [FromQuery] int? pageSize = 10)
+        public async Task<ActionResult<Contracts.Outgoing.TodosListContract>> GetAllTodos([FromQuery] int? pageNumber = null, [FromQuery] int? pageSize = 10)
         {
-            List<TodoBackend.Context.Managers.Records.Outgoing.TodoRecord> todoRecords = await todoManager.GetAllTodosAsync(pageNumber, pageSize);
+            List<TodoBackend.Context.Managers.Records.Outgoing.TodoRecord> todoRecords = new List<TodoBackend.Context.Managers.Records.Outgoing.TodoRecord>();
+            int todosCount = 0;
 
-            List<Contracts.Outgoing.TodoContract> todos = todoRecords.Select(x => new Contracts.Outgoing.TodoContract()
+            await Task.WhenAll(
+                 Task.Run(async () => { todoRecords = await todoManager.GetAllTodosAsync(pageNumber, pageSize); }),
+                 Task.Run(async () => { todosCount = await todoManager.CountAllTodoAsync(); })
+             );
+
+            Contracts.Outgoing.TodosListContract todosListContract = new TodosListContract()
             {
-                Id = x.Id,
-                Desciption = x.Desciption,
-                Title = x.Title,
-                TodoItems = x.TodoItems?.Select(y => new TodoItemContract()
+                CurrentPage = pageNumber ?? 1,
+                Count = todosCount,
+                Todos = todoRecords.Select(x => new Contracts.Outgoing.TodoContract()
                 {
-                    Id = y.Id,
-                    Desciption = y.Desciption,
-                    Title = y.Title,
-                    DueDate = y.DueDate,
+                    Id = x.Id,
+                    Description = x.Description,
+                    Title = x.Title,
+                    TodoItems = x.TodoItems?.Select(y => new TodoItemContract()
+                    {
+                        Id = y.Id,
+                        Description = y.Description,
+                        Title = y.Title,
+                        DueDate = y.DueDate,
+                    }).ToList()
                 }).ToList()
-            }).ToList();
+            };
 
-            return Ok(todos);
+            return Ok(todosListContract);
         }
 
         [HttpPost]
@@ -43,11 +54,11 @@ namespace TodosBackend.API.Controllers.Todo
         {
             TodoBackend.Context.Managers.Records.Incoming.TodoRecord todoRecord = new TodoBackend.Context.Managers.Records.Incoming.TodoRecord()
             {
-                Desciption = todoContract.Desciption,
+                Description = todoContract.Description,
                 Title = todoContract.Title,
                 TodoItems = todoContract.TodoItems?.Select(x => new TodoBackend.Context.Managers.Records.Incoming.TodoItemRecord()
                 {
-                    Desciption = x.Desciption,
+                    Description = x.Description,
                     Title = x.Title,
                     DueDate = x.DueDate,
                 }).ToList()
@@ -63,7 +74,7 @@ namespace TodosBackend.API.Controllers.Todo
         {
             TodoBackend.Context.Managers.Records.Incoming.TodoRecord todoRecord = new TodoBackend.Context.Managers.Records.Incoming.TodoRecord()
             {
-                Desciption = todoContract.Desciption,
+                Description = todoContract.Description,
                 Title = todoContract.Title
             };
 
@@ -77,7 +88,7 @@ namespace TodosBackend.API.Controllers.Todo
         {
             TodoBackend.Context.Managers.Records.Incoming.TodoItemRecord todoRecord = new TodoBackend.Context.Managers.Records.Incoming.TodoItemRecord()
             {
-                Desciption = todoItemContract.Desciption,
+                Description = todoItemContract.Description,
                 Title = todoItemContract.Title,
                 DueDate = todoItemContract.DueDate
             };

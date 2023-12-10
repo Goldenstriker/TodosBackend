@@ -1,8 +1,10 @@
-﻿namespace TodoBackend.Context.Managers.Records.Incoming
+﻿namespace TodoBackend.Context.Managers.Records.Internal
 {
-    public class TodoItemRecord
+    internal class TodoItemRecord
     {
         public Guid Id { get; set; }
+
+        public Guid TodoId { get; set; }
 
         public string Title { get; set; }
 
