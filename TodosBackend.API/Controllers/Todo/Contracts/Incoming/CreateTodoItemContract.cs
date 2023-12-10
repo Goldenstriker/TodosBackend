@@ -1,9 +1,7 @@
 ﻿namespace TodosBackend.API.Controllers.Todo.Contracts.Incoming
 {
-    public class IncomingTodoItemContract
+    public class CreateTodoItemContract
     {
-        public Guid Id { get; set; }
-
         public string Title { get; set; }
 
         public string Desciption { get; set; }

@@ -19,20 +19,10 @@ namespace TodoBackend.Context.Managers
 
             todo.Title = todoRecord.Title;
             todo.Description = todoRecord.Desciption;
-
-            if (todoRecord.TodoItems != null && todoRecord.TodoItems.Any())
-            {
-                foreach (TodoItemRecord item in todoRecord.TodoItems)
-                {
-                    TodoItem todoItem = todo.TodoItems?.SingleOrDefault(x => x.Id == item.Id && x.TodoId == todo.Id);
-                    context.CreateOrUpdateTodoItem(item, todo.Id, todoItem);
-                }
-            }
-
             return todo;
         }
 
-        private static TodoItem CreateOrUpdateTodoItem(this TodoContext context, TodoItemRecord todoItemRecord, Guid todoId, TodoItem todoItem)
+        internal static TodoItem CreateOrUpdateTodoItem(this TodoContext context, TodoItemRecord todoItemRecord, Guid todoId, TodoItem todoItem = null)
         {
             if (todoItem == null)
             {
