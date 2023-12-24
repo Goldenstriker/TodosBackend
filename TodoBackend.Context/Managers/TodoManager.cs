@@ -48,18 +48,18 @@ namespace TodoBackend.Context.Managers
             }
         }
 
-        public async Task UpdateTodoItemAsync(Guid todoId, Guid todoItemId, TodoItemRecord todoItemRecord)
+        public async Task UpdateTodoItemAsync(Guid todoListId, Guid todoItemId, TodoItemRecord todoItemRecord)
         {
             using (TodoContext context = new TodoContext(contextOptions))
             {
-                TodoItem? todoItem = await context.TodoItems.SingleOrDefaultAsync(x => x.TodoId == todoId && x.Id == todoItemId);
+                TodoItem? todoItem = await context.TodoItems.SingleOrDefaultAsync(x => x.Id == todoItemId && x.TodoId == todoListId);
 
                 if (todoItem == null)
                 {
                     return;
                 }
 
-                context.CreateOrUpdateTodoItem(todoItemRecord, todoId, todoItem);
+                context.CreateOrUpdateTodoItem(todoItemRecord, todoListId, todoItem);
                 await context.SaveChangesAsync();
             }
         }

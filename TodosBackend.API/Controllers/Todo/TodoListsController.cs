@@ -7,17 +7,17 @@ namespace TodosBackend.API.Controllers.Todo
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TodosController : ControllerBase
+    public class TodoListsController : ControllerBase
     {
         private readonly ITodoManager todoManager;
 
-        public TodosController(ITodoManager todoManager)
+        public TodoListsController(ITodoManager todoManager)
         {
             this.todoManager = todoManager;
         }
 
         [HttpGet]
-        public async Task<ActionResult<Contracts.Outgoing.TodosListContract>> GetAllTodos([FromQuery] int? pageNumber = null, [FromQuery] int? pageSize = 10)
+        public async Task<ActionResult<Contracts.Outgoing.TodosListContract>> GetAllTodoListsAsync([FromQuery] int? pageNumber = null, [FromQuery] int? pageSize = 10)
         {
             List<TodoBackend.Context.Managers.Records.Outgoing.TodoRecord> todoRecords = new List<TodoBackend.Context.Managers.Records.Outgoing.TodoRecord>();
             int todosCount = 0;
@@ -50,7 +50,7 @@ namespace TodosBackend.API.Controllers.Todo
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateTodo([FromBody] CreateTodoContract todoContract)
+        public async Task<ActionResult> CreateTodoListAsync([FromBody] CreateTodoContract todoContract)
         {
             TodoBackend.Context.Managers.Records.Incoming.TodoRecord todoRecord = new TodoBackend.Context.Managers.Records.Incoming.TodoRecord()
             {
@@ -70,7 +70,7 @@ namespace TodosBackend.API.Controllers.Todo
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> CreateTodo(Guid id, [FromBody] UpdateTodoContract todoContract)
+        public async Task<ActionResult> UpdateTodoListAsync(Guid id, [FromBody] UpdateTodoContract todoContract)
         {
             TodoBackend.Context.Managers.Records.Incoming.TodoRecord todoRecord = new TodoBackend.Context.Managers.Records.Incoming.TodoRecord()
             {
@@ -79,21 +79,6 @@ namespace TodosBackend.API.Controllers.Todo
             };
 
             await todoManager.UpdateTodoAsync(id, todoRecord);
-
-            return Ok();
-        }
-
-        [HttpPut("{todoId}/todoItem/{todoItemId}")]
-        public async Task<ActionResult> CreateTodo(Guid todoId, Guid todoItemId, [FromBody] UpdateTodoItemContract todoItemContract)
-        {
-            TodoBackend.Context.Managers.Records.Incoming.TodoItemRecord todoRecord = new TodoBackend.Context.Managers.Records.Incoming.TodoItemRecord()
-            {
-                Description = todoItemContract.Description,
-                Title = todoItemContract.Title,
-                DueDate = todoItemContract.DueDate
-            };
-
-            await todoManager.UpdateTodoItemAsync(todoId, todoItemId, todoRecord);
 
             return Ok();
         }

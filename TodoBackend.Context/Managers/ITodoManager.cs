@@ -8,13 +8,13 @@ namespace TodoBackend.Context.Managers
 
         Task CreateTodoAsync(TodoRecord todoRecord);
 
-        Task UpdateTodoAsync(Guid todoId, TodoRecord todoRecord);
+        Task UpdateTodoAsync(Guid todoListId, TodoRecord todoRecord);
 
-        Task UpdateTodoItemAsync(Guid todoId, Guid todoItemId, TodoItemRecord todoItemRecord);
+        Task UpdateTodoItemAsync(Guid todoListId, Guid todoListItemId, TodoItemRecord todoItemRecord);
 
-        Task DeleteTodoAsync(Guid todoId);
+        Task DeleteTodoAsync(Guid todoListId);
 
-        Task DeleteTodoItemAsync(Guid todoId);
+        Task DeleteTodoItemAsync(Guid todoListItemId);
 
         Task<int> CountAllTodoAsync();
     }
