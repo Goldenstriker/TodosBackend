@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Utility;
 
 namespace TodoBackend.Context.Models
 {
-    internal class TodoItem : IBaseModel
+    internal class TodoItem : IBaseEntity
     {
         public Guid Id { get; set; }
 

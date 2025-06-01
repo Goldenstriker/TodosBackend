@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using TodoBackend.Context;
 using TodoBackend.Context.Managers;
+using TodoBackend.Context.Managers.TodosList;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,21 +20,23 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<ITodoManager, TodoManager>();
+builder.Services.AddTransient<ITodosProvider, TodosProvider>();
 
 builder.Services.AddDbContext<TodoContext>((options) =>
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("SQLConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("SQLConnection"));
 });
 
-{
-    DbContextOptionsBuilder<TodoContext> optionsBuilder = new DbContextOptionsBuilder<TodoContext>();
-    DbContextOptions<TodoContext> options = optionsBuilder.UseSqlite(builder.Configuration.GetConnectionString("SQLConnection")).Options;
 
-    using (TodoContext todoContext = new TodoContext(options))
-    {
-        await todoContext.Database.MigrateAsync();
-    }
+DbContextOptionsBuilder<TodoContext> optionsBuilder = new DbContextOptionsBuilder<TodoContext>();
+DbContextOptions<TodoContext> options = optionsBuilder.UseNpgsql(builder.Configuration.GetConnectionString("SQLConnection")).Options;
+
+using (TodoContext todoContext = new TodoContext(options))
+{
+    todoContext.Migrate();
+    SeedAudit.SeedDatabase(todoContext);
 }
+
 
 var app = builder.Build();
 
