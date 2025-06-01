@@ -9,22 +9,27 @@ public class SeedAudit
 
     public static void SeedDatabase(TodoContext todoContext)
     {
-        using var transaction = todoContext.Database.BeginTransaction();
-        SeedSubscribers(todoContext);
-        SeedSubscriptions(todoContext);
+        if (todoContext.Database.CanConnect())
+        {
+            using var transaction = todoContext.Database.BeginTransaction();
+            SeedSubscribers(todoContext);
+            SeedSubscriptions(todoContext);
 
-        transaction.Commit();
+            transaction.Commit();
+        }
     }
 
-    protected static void SeedSubscribers(TodoContext context) {
+    protected static void SeedSubscribers(TodoContext context)
+    {
         List<string> subscribers = new List<string>();
         subscribers.Add(TodoSubscriptionName);
+        context.AddSubcribers(subscribers);
     }
 
     protected static void SeedSubscriptions(TodoContext context)
     {
         List<Tuple<string, string, Guid>> subscriptions = new List<Tuple<string, string, Guid>>();
-        { 
+        {
             AuditSubscriber subscriber = context.GetSubscriber(TodoSubscriptionName);
 
             if (subscriber != null)

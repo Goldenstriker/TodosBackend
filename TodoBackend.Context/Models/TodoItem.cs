@@ -3,7 +3,7 @@ using Utility;
 
 namespace TodoBackend.Context.Models
 {
-    internal class TodoItem : IBaseEntity
+    internal class TodoItem : IBaseEntity, IAuditLog
     {
         public Guid Id { get; set; }
 

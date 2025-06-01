@@ -5,6 +5,17 @@ using TodoBackend.Context.Managers.TodosList;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+DbContextOptionsBuilder<TodoContext> optionsBuilder = new DbContextOptionsBuilder<TodoContext>();
+DbContextOptions<TodoContext> options = optionsBuilder.UseNpgsql(builder.Configuration.GetConnectionString("SQLConnection")).Options;
+
+using (TodoContext todoContext = new TodoContext(options))
+{
+    todoContext.Migrate();
+    SeedAudit.SeedDatabase(todoContext);
+}
+
+
 //// Add services to the container.
 builder.Services.AddCors(options =>
 {
@@ -25,17 +36,8 @@ builder.Services.AddTransient<ITodosProvider, TodosProvider>();
 builder.Services.AddDbContext<TodoContext>((options) =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("SQLConnection"));
+    options.EnableDetailedErrors();
 });
-
-
-DbContextOptionsBuilder<TodoContext> optionsBuilder = new DbContextOptionsBuilder<TodoContext>();
-DbContextOptions<TodoContext> options = optionsBuilder.UseNpgsql(builder.Configuration.GetConnectionString("SQLConnection")).Options;
-
-using (TodoContext todoContext = new TodoContext(options))
-{
-    todoContext.Migrate();
-    SeedAudit.SeedDatabase(todoContext);
-}
 
 
 var app = builder.Build();
